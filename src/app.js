@@ -20,6 +20,18 @@ app.use("/test", (req, res) => {
   res.send("Response form the server!");
 });
 
-app.listen(3000, () => {
-  console.log("Server successfully listening on port number 3000");
+// Query params 
+app.get("/search", (req, res) => {
+  const { name, age } = req.query;
+  res.send(`Searching for ${name} and ${age}`);
+});
+
+// Dynamic routes
+app.get("/users/:userId", (req, res) => {
+  const { userId } = req.params;
+  res.send(`User ID ${userId}`);
+});
+
+app.listen(7777, () => {
+  console.log("Server successfully listening on port number 7777...");
 });
