@@ -10,9 +10,15 @@ const first = (req, res, next) => {
 
 const second = (req, res, next) => {
   console.log("Second");
+<<<<<<< HEAD
   // next();
   const err = new Error("Something went wrong!");
   next(err);
+=======
+  next();
+  // const err = new Error("Something went wrong!");
+  // next(err);
+>>>>>>> abf6c7721fdc3d506be4cdefecb503b1693397a9
 };
 
 app.use((err, req, res, next) => {
