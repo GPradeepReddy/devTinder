@@ -1,32 +1,47 @@
 const express = require("express");
+const { adminAuth, userAuth } = require("./middlewares/auth.js");
 
 const app = express();
 
-app.get(
-  "/user",
-  (req, res, next) => {
-    console.log("user first response");
-    next();
-  },
-  (req, res, next) => {
-    console.log("user second response");
-    next();
-  },
-  (req, res, next) => {
-    console.log("user third response");
-    next();
-  },
-  (req, res, next) => {
-    console.log("user fourth response");
-    next();
-  },
-  (req, res) => {
-    console.log("user fifth response");
-    res.send({ firstName: "Pradeep", lastName: "Reddy" });
-  }
-);
+const first = (req, res, next) => {
+  console.log("First");
+  next();
+};
 
-app.post("/user", async (req, res) => {
+const second = (req, res, next) => {
+  console.log("Second");
+  next();
+  // const err = new Error("Something went wrong!");
+  // next(err);
+};
+
+app.use((err, req, res, next) => {
+  res.status(500).send(err.message);
+});
+
+const logReq = (req, rews, next) => {
+  console.log("Login request");
+  next();
+};
+
+const authReq = (req, rews, next) => {
+  console.log("Auth request");
+  next();
+};
+
+const sendResponse = (req, res) => {
+  res.send("Success!");
+};
+
+app.get("/dashboard", logReq, [authReq], sendResponse);
+
+app.use("/admin", adminAuth, sendResponse);
+
+app.get("/user", first, second, (req, res) => {
+  res.send({ firstName: "Pradeep", lastName: "Reddy" });
+});
+
+app.post("/user", userAuth, async (req, res) => {
   console.log(req.body);
   res.send("User data saved successfully");
 });
