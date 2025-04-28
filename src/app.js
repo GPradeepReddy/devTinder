@@ -1,49 +1,28 @@
 const express = require("express");
 const { adminAuth, userAuth } = require("./middlewares/auth.js");
+const connectDB = require("./config/database.js");
 
 const app = express();
+const User = require("./models/user.js");
 
-const first = (req, res, next) => {
-  console.log("First");
-  next();
-};
+app.post("/signup", async (req, res) => {
 
-const second = (req, res, next) => {
-  console.log("Second");
-<<<<<<< HEAD
-  // next();
-  const err = new Error("Something went wrong!");
-  next(err);
-=======
-  next();
-  // const err = new Error("Something went wrong!");
-  // next(err);
->>>>>>> abf6c7721fdc3d506be4cdefecb503b1693397a9
-};
+  const user = new User({
+    firstName: "Pradeep",
+    lastName: "Reddy",
+    email: "pradeep@gmail.com",
+    password: "123",
+  });
 
-app.use((err, req, res, next) => {
-  res.status(500).send(err.message);
+  try {
+    await user.save();
+    res.send("user added successfully");
+  } catch (err) {
+    res.status(400).send("error on saving the user " + err.message);
+  }
 });
 
-const logReq = (req, rews, next) => {
-  console.log("Login request");
-  next();
-};
-
-const authReq = (req, rews, next) => {
-  console.log("Auth request");
-  next();
-};
-
-const sendResponse = (req, res) => {
-  res.send("Success!");
-};
-
-app.get("/dashboard", logReq, [authReq], sendResponse);
-
-app.use("/admin", adminAuth, sendResponse);
-
-app.get("/user", first, second, (req, res) => {
+app.get("/user", (req, res) => {
   res.send({ firstName: "Pradeep", lastName: "Reddy" });
 });
 
@@ -54,10 +33,6 @@ app.post("/user", userAuth, async (req, res) => {
 
 app.delete("/user", (req, res) => {
   res.send("User deleted successfully");
-});
-
-app.use("/test", (req, res) => {
-  res.send("Response form the server!");
 });
 
 // Query params
@@ -73,11 +48,18 @@ app.get("/users/:userId/:name/:password", (req, res) => {
 });
 
 //Global erorr handling
-app.use('/', (err, req, res) => {
+app.use("/", (err, req, res) => {
   console.log("Error occured " + err.message);
   res.status(500).send(err.message);
 });
 
-app.listen(7777, () => {
-  console.log("Server successfully listening on port number 7777...");
-});
+connectDB()
+  .then(() => {
+    console.log("DB connection established...");
+    app.listen(7777, () => {
+      console.log("Server successfully listening on port number 7777...");
+    });
+  })
+  .catch((err) => {
+    console.error("DB connection error " + err);
+  });
