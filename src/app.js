@@ -9,10 +9,30 @@ app.use(express.json()); // To parse JSON body
 
 app.post("/signup", async (req, res) => {
   try {
-    const { firstName, lastName, email, password } = req.body;
+    const {
+      firstName,
+      lastName,
+      email,
+      password,
+      gender,
+      age,
+      skills,
+      about,
+      photoUrl,
+    } = req.body;
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).send("User already existing");
-    const user = new User({ firstName, lastName, email, password });
+    const user = new User({
+      firstName,
+      lastName,
+      email,
+      password,
+      gender,
+      age,
+      skills,
+      about,
+      photoUrl,
+    });
     await user.save();
     res.send("User added successfully");
   } catch (err) {
