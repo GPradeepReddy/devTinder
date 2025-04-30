@@ -44,6 +44,26 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).send("Email and Password required");
+    }
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).send("Invalid email or password");
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(400).send({ message: "Invalid email or password" });
+    }
+    res.status(200).send({ message: "Login successful" });
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+});
+
 app.get("/user", async (req, res) => {
   try {
     const { email } = req.body;
