@@ -4,7 +4,7 @@ const userSchema = new Schema(
   {
     firstName: {
       type: String,
-      required: true,
+      required: [true, 'Name must be required'],
       minLength: 4,
       maxLength: 24,
     },
@@ -21,6 +21,7 @@ const userSchema = new Schema(
     password: {
       type: String,
       required: true,
+      minLength: [6, 'Password minimum 6 charecters']
     },
     age: {
       type: Number,
