@@ -1,6 +1,8 @@
 const express = require("express");
 const { adminAuth, userAuth } = require("./middlewares/auth.js");
 const connectDB = require("./config/database.js");
+const { validateSignupData } = require("./utils/validation.js");
+const bcrypt = require("bcrypt");
 
 const app = express();
 const User = require("./models/user.js");
@@ -8,25 +10,27 @@ const User = require("./models/user.js");
 app.use(express.json()); // To parse JSON body
 
 app.post("/signup", async (req, res) => {
+  const {
+    firstName,
+    lastName,
+    email,
+    password,
+    gender,
+    age,
+    skills,
+    about,
+    photoUrl,
+  } = req.body;
   try {
-    const {
-      firstName,
-      lastName,
-      email,
-      password,
-      gender,
-      age,
-      skills,
-      about,
-      photoUrl,
-    } = req.body;
+    validateSignupData(req);
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).send("User already existing");
+    const passwordHash = await bcrypt.hash(password, 10);
     const user = new User({
       firstName,
       lastName,
       email,
-      password,
+      password: passwordHash,
       gender,
       age,
       skills,
