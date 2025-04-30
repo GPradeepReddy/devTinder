@@ -6,37 +6,31 @@ const userSchema = new Schema(
     firstName: {
       type: String,
       required: [true, "Name must be required"],
-      minLength: 4,
-      maxLength: 24,
+      trim: true,
+      minLength: [3, "Name must be at least 3 characters"],
+      maxLength: [24, "Name must be max 24 characters"],
     },
     lastName: {
       type: String,
     },
     email: {
       type: String,
-      required: true,
+      required: [true, "Email is required"],
       unique: true,
-      trim: true,
       lowercase: true,
-      validate(value) {
-        if (!validator.isEmail(value)) {
-          throw new Error("Email is not valid " + value);
-        }
-      },
+      validate: [validator.isEmail, "Please provide a valid email"],
+      trim: true,
     },
     password: {
       type: String,
-      required: true,
-      minLength: [6, "Password minimum 6 charecters"],
-      validate(value) {
-        if (!validator.isStrongPassword(value)) {
-          throw new Error("Week password " + value);
-        }
-      },
+      required: [true, "Password is required"],
+      minLength: [6, "Password must be at least 6 characters"],
+      validate: [validator.isStrongPassword, "Password must be stronger"],
     },
     age: {
       type: Number,
-      min: 18,
+      min: [18, "Minimum age is 18"],
+      default: 18,
     },
     gender: {
       type: String,
@@ -49,11 +43,7 @@ const userSchema = new Schema(
     photoUrl: {
       type: String,
       default: "https://geographyandyou.com/images/user-profile.png",
-      validate(value) {
-        if (!validator.isURL(value)) {
-          throw new Error("Invalid URL " + value);
-        }
-      },
+      validate: [validator.isURL, "Invalid photo URL"],
     },
     about: {
       type: String,
