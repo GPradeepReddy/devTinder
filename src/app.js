@@ -3,11 +3,14 @@ const { adminAuth, userAuth } = require("./middlewares/auth.js");
 const connectDB = require("./config/database.js");
 const { validateSignupData } = require("./utils/validation.js");
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 const User = require("./models/user.js");
 
 app.use(express.json()); // To parse JSON body
+app.use(cookieParser());
 
 app.post("/signup", async (req, res) => {
   const {
@@ -55,12 +58,46 @@ app.post("/login", async (req, res) => {
       return res.status(400).send("Invalid email or password");
     }
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
+    if (isPasswordValid) {
+      const token = jwt.sign({ _id: user._id }, "DEV@Tinder$790");
+      res.cookie("token", token, {
+        httpOnly: true, // Can't access cookie using JS (more secure)
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 Days
+      });
+      res.status(200).send({ message: "Login successful" });
+    } else {
       return res.status(400).send({ message: "Invalid email or password" });
     }
-    res.status(200).send({ message: "Login successful" });
   } catch (error) {
     res.status(500).send({ message: error.message });
+  }
+});
+
+app.get("/setcookie", (req, res) => {
+  res.cookie("testcookie", "helloworld");
+  res.send("Cookies has been send");
+});
+
+app.get("/profile", async (req, res) => {
+  try {
+    const cookies = req.cookies;
+
+    const { token } = cookies;
+    if (!token) {
+      throw new Error("Invalid Token");
+    }
+
+    const decodedMessage = await jwt.verify(token, "DEV@Tinder$790");
+
+    const { _id } = decodedMessage;
+
+    const user = await User.findById(_id);
+    if (!user) {
+      throw new Error("User does not exist");
+    }
+    res.send(user);
+  } catch (error) {
+    res.status(500).send(error.message);
   }
 });
 
