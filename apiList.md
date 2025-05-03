@@ -8,17 +8,16 @@
 # profileRouter
 - GET /profile/view
 - PATCH /profile/edit
-- PATCH /profile/password
+- PATCH /profile/password // forgot password API
 
 # connectionRequestsRouter
-- POST /request/send/intrested/:userId
-- POST /request/send/ignored/:userID
-- POST /request/review/accepted/:requestId
-- POST /request/review/rejected/:requestId
+- POST /request/send/:status/:userId
+- POST /request/review/:status/:requestId
+
 
 # userRouter
 - GET /user/connections
 - GET /user/requests
 - GET /user/feed
 
-- status ignore, intrested, accepted, rejected 
+- status: ignored, interested, accepted, rejected 
